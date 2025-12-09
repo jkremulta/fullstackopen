@@ -4,12 +4,17 @@ import Filter from './components/Filter'
 import Form from './components/Form'
 import Persons from './components/Persons'
 import phonebookServices from './services/phonebook'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null
+  })
 
   useEffect(() => {
     axios
@@ -34,8 +39,23 @@ const App = () => {
       phonebookServices
         .update(existingPerson.id, personsObject)
         .then(returnedPerson => {
-          setPersons(persons.map(person => person.id == existingPerson.id ? returnedPerson : person))
+          setPersons(persons.map(person => person.id === existingPerson.id ? returnedPerson : person))
+          setNotification({
+          message: `Updated ${newName}'s number`,
+          type: 'success'
+          })
+          setTimeout(() => setNotification({ message: null, type: null }), 5000)
         })
+        .catch(() => {
+          setNotification({
+            message: `Information of ${newName} has already been removed from server`,
+            type: 'error'
+          })
+          setTimeout(() => setNotification({ message: null, type: null }), 5000)
+          setPersons(persons.filter(person => person.name !== newName))
+        })
+        setNewName('')
+        setNewNumber('')
       }
       return 
     }
@@ -45,6 +65,12 @@ const App = () => {
       .then(returnedPhonebook => {
         setPersons(persons.concat(returnedPhonebook))
       })
+    
+    setNotification({
+      message: `Added ${newName} to the phonebook`,
+      type: 'success'
+      })
+    setTimeout(() => setNotification({ message: null, type: null }), 5000)
     setNewName('')
     setNewNumber('')
   }
@@ -77,6 +103,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message ={notification.message} type={notification.type}/>
       <Filter value={nameFilter} onChange={handleNameFilter}/>
       <h2>add a new</h2>
       <Form 

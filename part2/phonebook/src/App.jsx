@@ -32,7 +32,7 @@ const App = () => {
       number: newNumber,
     }
 
-    const existingPerson = persons.find(person => person.name === newName)XMLDocument
+    const existingPerson = persons.find(person => person.name === newName)
     if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
       phonebookServices

@@ -18,7 +18,7 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/api/persons')
+      .phonebookServices.getAll()
       .then(response => {
         setPersons(response.data)
       })

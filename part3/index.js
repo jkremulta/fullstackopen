@@ -1,8 +1,10 @@
 const morgan = require('morgan')
 const express = require('express')
+const cors = require('cors')
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 morgan.token('body', (request, response) => {
   return JSON.stringify(request.body)
@@ -35,6 +37,19 @@ let phonebook = [
 // returns all the phonebook contacts
 app.get('/api/persons', (request, response) => {
   response.json(phonebook)
+})
+
+// update a contact number
+app.put('/api/persons/:id',(request, response) => {
+  const id = request.params.id
+  const body = request.body
+
+  const personIndex = phonebook.findIndex(contact => contact.id == id)
+  const updatedPerson = {...phonebook[personIndex], name: body.name, number: body.number}
+  phonebook[personIndex] = updatedPerson
+
+  response.json(updatedPerson)
+
 })
 
 // returns a contact

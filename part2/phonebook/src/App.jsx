@@ -18,7 +18,7 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/persons')
+      .get('http://localhost:3001/api/persons')
       .then(response => {
         setPersons(response.data)
       })
@@ -32,8 +32,7 @@ const App = () => {
       number: newNumber,
     }
 
-    const existingPerson = persons.find(person => person.name === newName)
-
+    const existingPerson = persons.find(person => person.name === newName)XMLDocument
     if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
       phonebookServices

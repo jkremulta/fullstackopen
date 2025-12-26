@@ -17,10 +17,10 @@ const App = () => {
   })
 
   useEffect(() => {
-    axios
-      .phonebookServices.getAll()
+    phonebookServices
+      .getAll()
       .then(response => {
-        setPersons(response.data)
+        setPersons(response)
       })
   }, [])
 

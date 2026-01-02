@@ -36,3 +36,22 @@ It provides a RESTful API to manage contacts, allowing users to add, read, updat
 ```bash
 git clone <your-repo-url>
 cd phonebook-backend
+```
+
+2. View the live backend here:  
+https://fullstackopen-haxo.onrender.com/
+
+## Available Endpoints
+
+| Method | Endpoint | Description |
+|-------|---------|-------------|
+| GET | /api/persons | Get all contacts |
+| GET | /api/persons/:id | Get a contact by ID |
+| POST | /api/persons | Add a new contact |
+| PUT | /api/persons/:id | Update a contact |
+| DELETE | /api/persons/:id | Delete a contact |
+| GET | /info | Get phonebook info |
+
+## License
+
+This project is for learning purposes as part of **Full Stack Open**.

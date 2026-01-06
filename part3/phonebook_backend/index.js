@@ -2,6 +2,8 @@ const morgan = require('morgan')
 const express = require('express')
 const cors = require('cors')
 
+require('dotenv').config()
+const Phonebook = require('./models/phonebook')
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -12,78 +14,62 @@ morgan.token('body', (request, response) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let phonebook = [
-  { 
-    "id": "1",
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": "2",
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": "3",
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": "4",
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
 
 // returns all the phonebook contacts
 app.get('/api/persons', (request, response) => {
-  response.json(phonebook)
+  Phonebook.find({}).then(contacts => {
+    response.json(contacts)
+  })
 })
 
 // update a contact number
 app.put('/api/persons/:id',(request, response) => {
-  const id = request.params.id
-  const body = request.body
+  const { name, number } = request.body
 
-  const personIndex = phonebook.findIndex(contact => contact.id == id)
-  const updatedPerson = {...phonebook[personIndex], name: body.name, number: body.number}
-  phonebook[personIndex] = updatedPerson
-
-  response.json(updatedPerson)
-
-})
+  Phonebook
+    .findByIdAndUpdate(
+      request.params.id, 
+      { name, number},
+      { new: true })
+    .then(updatedContact => {
+      if (updatedContact) {
+        response.json(updatedContact)
+      } else {
+        response.status(404).end()
+      }
+    }) 
+  })
 
 // returns a contact
 app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const person = phonebook.find(contact => contact.id === id)
-
-  if (person) {
-    return response.json(person)
-  } 
-
-  return response.status(404).json({
-    "error": "Contact not found"
-  })
+  Phonebook
+    .findById(request.params.id)
+    .then(contact => {
+      if (contact) {
+        return response.json(contact)
+      } else {
+        return response.status(404).json({ "error": "Contact not found" })
+      }
+    })
 })
 
 // delete a contact
 app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  phonebook = phonebook.filter(c => c.id !== id)
-
-  response.status(204).end()
+  Phonebook
+    .findByIdAndDelete(request.params.id)
+    .then(contact => {
+      if (!contact) {
+        return response.status(404).end()
+      } else {
+        return response.status(204).end()
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      response.status(400).send({ error: 'malformatted id' })
+    })
 })
-
-// generates a random Id for adding a contact in phonebook
-const generateRandomId = () => {
-  return Math.floor(Math.random() * 100000).toString()
-}
-
-// check if name already exists in phonebook
-const checkDuplicate = (name) => {
-  return phonebook.some(contact => contact.name === name)
-}
 
 // adds a contact in phonebook
 app.post('/api/persons', (request, response) => {
@@ -95,38 +81,38 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  if (checkDuplicate(body.name)) {
-    return response.status(400).json({
-      error: "Name must be unique"
+  // check for duplicate
+  Phonebook
+    .exists({ name: body.name })
+    .then(exists => {
+      if (exists) {
+        return response.status(400).json({ error: 'Name must be unique' })
+      }
+
+      const contact = new Phonebook({
+        name: body.name,
+        number: body.number,
+      })
+
+      contact.save().then(c => response.json(c))
     })
-  }
-
-  const contact = {
-    "id": generateRandomId(),
-    "name": body.name, 
-    "number": body.number
-  }
-
-  phonebook = phonebook.concat(contact)
-  response.json(contact)
 })
 
 
 // returns how many users are inside the phonebook and shows time
 app.get('/info', (request, response) => {
-  const numberOfUsers = phonebook.length
-  const date = new Date()
-  response.send(
-    `<div>
-      <p>Phonebook has info for ${numberOfUsers} people </p>
-      <p>${date}</p>
-    </div>`
-    
-  )
+  Phonebook
+    .countDocuments({})
+    .then(count => {
+      const date = new Date()
+      response.send(
+        `<div>
+          <p>Phonebook has info for ${count} people </p>
+          <p>${date}</p>
+        </div>`
+      )
+    })
 })
-
-
-
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

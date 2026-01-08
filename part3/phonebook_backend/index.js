@@ -16,21 +16,22 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 
 // returns all the phonebook contacts
-app.get('/api/persons', (request, response) => {
-  Phonebook.find({}).then(contacts => {
-    response.json(contacts)
-  })
+app.get('/api/persons', (request, response, next) => {
+  Phonebook.find({})
+    .then(contacts => {
+      response.json(contacts)
+    })
+    .catch(error => next(error))
 })
 
 // update a contact number
-app.put('/api/persons/:id',(request, response) => {
+app.put('/api/persons/:id',(request, response, next) => {
   const { name, number } = request.body
 
-  Phonebook
-    .findByIdAndUpdate(
-      request.params.id, 
-      { name, number},
-      { new: true })
+  Phonebook.findByIdAndUpdate(
+    request.params.id, 
+    { name, number},
+    { new: true })
     .then(updatedContact => {
       if (updatedContact) {
         response.json(updatedContact)
@@ -38,10 +39,11 @@ app.put('/api/persons/:id',(request, response) => {
         response.status(404).end()
       }
     }) 
-  })
+    .catch(error => next(error))
+})
 
 // returns a contact
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   Phonebook
     .findById(request.params.id)
@@ -52,10 +54,11 @@ app.get('/api/persons/:id', (request, response) => {
         return response.status(404).json({ "error": "Contact not found" })
       }
     })
+    .catch(error => next(error))
 })
 
 // delete a contact
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Phonebook
     .findByIdAndDelete(request.params.id)
     .then(contact => {
@@ -65,42 +68,40 @@ app.delete('/api/persons/:id', (request, response) => {
         return response.status(204).end()
       }
     })
-    .catch(error => {
-      console.log(error)
-      response.status(400).send({ error: 'malformatted id' })
-    })
+    .catch(error => next(error))
 })
 
 // adds a contact in phonebook
-app.post('/api/persons', (request, response) => {
-  const body = request.body
+app.post('/api/persons', (request, response, next) => {
+  const { name, number } = request.body
 
-  if (!body.name || !body.number) {
+  if (!name || !number) {
     return response.status(400).json({
       error: "Name or number is missing"
     })
   }
 
-  // check for duplicate
-  Phonebook
-    .exists({ name: body.name })
-    .then(exists => {
-      if (exists) {
-        return response.status(400).json({ error: 'Name must be unique' })
+  // update database if same name exists
+  Phonebook.findOne( { name })
+    .then(existingPerson => {
+      if (existingPerson) {
+        existingPerson.number = number
+        return existingPerson.save()
       }
 
-      const contact = new Phonebook({
-        name: body.name,
-        number: body.number,
-      })
-
-      contact.save().then(c => response.json(c))
+      // if person does not exist
+      const newPerson = new Phonebook({ name, number })
+      return newPerson.save()
     })
+    .then(savedPerson => {
+      return response.json(savedPerson)
+    })
+    .catch(error => next(error))
 })
 
 
 // returns how many users are inside the phonebook and shows time
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Phonebook
     .countDocuments({})
     .then(count => {
@@ -112,7 +113,26 @@ app.get('/info', (request, response) => {
         </div>`
       )
     })
+    .catch(error => next(error))
 })
+
+// error when user calls a route that does not exist
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
+
+// middleware for error handling
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).json({ 'error': 'malformatted id' })
+  } 
+
+  next(error)
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

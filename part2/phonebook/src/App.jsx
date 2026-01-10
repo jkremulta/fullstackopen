@@ -44,13 +44,20 @@ const App = () => {
           })
           setTimeout(() => setNotification({ message: null, type: null }), 5000)
         })
-        .catch(() => {
-          setNotification({
-            message: `Information of ${newName} has already been removed from server`,
-            type: 'error'
-          })
+        .catch(error => {
+          if (error.response.status === 400) {
+            setNotification({
+              message: error.response.data.error,
+              type: 'error'
+            })
+          } else {
+              setNotification({
+              message: `test`,
+              type: 'error'
+            })
+            setPersons(persons.filter(person => person.name !== newName))
+          }
           setTimeout(() => setNotification({ message: null, type: null }), 5000)
-          setPersons(persons.filter(person => person.name !== newName))
         })
         setNewName('')
         setNewNumber('')
@@ -62,15 +69,21 @@ const App = () => {
       .create(personsObject)
       .then(returnedPhonebook => {
         setPersons(persons.concat(returnedPhonebook))
+        setNotification({
+          message: `Added ${newName} to the phonebook`,
+          type: 'success'
+          })
+          setTimeout(() => setNotification({ message: null, type: null }), 5000)
+          setNewName('')
+          setNewNumber('')
       })
-    
-    setNotification({
-      message: `Added ${newName} to the phonebook`,
-      type: 'success'
+      .catch(error => {
+        setNotification({
+          message: error.response.data.error,
+          type: 'error'
+        })
+        setTimeout(() => setNotification({ message: null, type: null }), 5000)
       })
-    setTimeout(() => setNotification({ message: null, type: null }), 5000)
-    setNewName('')
-    setNewNumber('')
   }
 
   const deletePerson = (id) => {

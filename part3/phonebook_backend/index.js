@@ -31,7 +31,11 @@ app.put('/api/persons/:id',(request, response, next) => {
   Phonebook.findByIdAndUpdate(
     request.params.id, 
     { name, number},
-    { new: true })
+    { 
+      new: true,
+      runValidators: true,
+      context: 'query'
+    })
     .then(updatedContact => {
       if (updatedContact) {
         response.json(updatedContact)
@@ -75,30 +79,11 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   const { name, number } = request.body
 
-  if (!name || !number) {
-    return response.status(400).json({
-      error: "Name or number is missing"
-    })
-  }
-
-  // update database if same name exists
-  Phonebook.findOne( { name })
-    .then(existingPerson => {
-      if (existingPerson) {
-        existingPerson.number = number
-        return existingPerson.save()
-      }
-
-      // if person does not exist
-      const newPerson = new Phonebook({ name, number })
-      return newPerson.save()
-    })
-    .then(savedPerson => {
-      return response.json(savedPerson)
-    })
+  const newPerson = new Phonebook ({ name, number })
+  newPerson.save()
+    .then(savedPerson => response.status(201).json(savedPerson))
     .catch(error => next(error))
 })
-
 
 // returns how many users are inside the phonebook and shows time
 app.get('/info', (request, response, next) => {
@@ -124,11 +109,13 @@ app.use(unknownEndpoint)
 
 // middleware for error handling
 const errorHandler = (error, request, response, next) => {
-  console.log(error.message)
+  console.log('Error caught:', error)  
 
   if (error.name === 'CastError') {
     return response.status(400).json({ 'error': 'malformatted id' })
-  } 
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ 'error': error.message })
+  }
 
   next(error)
 }

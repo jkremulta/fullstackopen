@@ -1,5 +1,8 @@
+// http request logger
 const morgan = require('morgan')
+// node framework for node.js
 const express = require('express')
+// allows frontend to call backend in different port
 const cors = require('cors')
 
 require('dotenv').config()
@@ -9,7 +12,7 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-morgan.token('body', (request, response) => {
+morgan.token('body', (request) => {
   return JSON.stringify(request.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
@@ -29,9 +32,9 @@ app.put('/api/persons/:id',(request, response, next) => {
   const { name, number } = request.body
 
   Phonebook.findByIdAndUpdate(
-    request.params.id, 
-    { name, number},
-    { 
+    request.params.id,
+    { name, number },
+    {
       new: true,
       runValidators: true,
       context: 'query'
@@ -42,20 +45,19 @@ app.put('/api/persons/:id',(request, response, next) => {
       } else {
         response.status(404).end()
       }
-    }) 
+    })
     .catch(error => next(error))
 })
 
 // returns a contact
 app.get('/api/persons/:id', (request, response, next) => {
-  const id = request.params.id
   Phonebook
     .findById(request.params.id)
     .then(contact => {
       if (contact) {
         return response.json(contact)
       } else {
-        return response.status(404).json({ "error": "Contact not found" })
+        return response.status(404).json({ 'error': 'Contact not found' })
       }
     })
     .catch(error => next(error))
@@ -109,7 +111,7 @@ app.use(unknownEndpoint)
 
 // middleware for error handling
 const errorHandler = (error, request, response, next) => {
-  console.log('Error caught:', error)  
+  console.log('Error caught:', error)
 
   if (error.name === 'CastError') {
     return response.status(400).json({ 'error': 'malformatted id' })

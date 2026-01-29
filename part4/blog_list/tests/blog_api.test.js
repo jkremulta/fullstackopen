@@ -10,9 +10,25 @@ const User = require('../models/user')
 
 const api = supertest(app)
 
+let token
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
+
+  // create new user
+  const newUser = {
+    username: 'testuser',
+    name: 'Test User',
+    password: 'password123'
+  }
+  await api.post('/api/users').send(newUser)
+
+  // get token from new user
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'testuser', password: 'password123' })
+
+  token = loginResponse.body.token
 })
 
 test('blog returns the correct amount of posts', async () => {
@@ -46,6 +62,7 @@ test('a blog can be added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -57,6 +74,36 @@ test('a blog can be added', async () => {
   assert(contents.includes('Joshua Kenta'))
 })
 
+test('blog creation fails with invalid token', async () => {
+  const newBlog = {
+    title: 'JK Blog',
+    author: 'Joshua Kenta',
+    url: 'www.jkhirako.com',
+    likes: 1,
+  }
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', 'Bearer wrongtoken')
+    .send(newBlog)
+    .expect(401)
+})
+
+test('blog creation fails without token', async () => {
+  const newBlog = {
+    title: 'JK Blog',
+    author: 'Joshua Kenta',
+    url: 'www.jkhirako.com',
+    likes: 1,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+})
+
+
 test('verify that if likes property is empty, defaults to value 0', async () => {
   const newBlog = {
     title: 'JK Blog',
@@ -66,6 +113,7 @@ test('verify that if likes property is empty, defaults to value 0', async () => 
 
   const returnedBlog = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -81,25 +129,41 @@ test('if title & url properties are missing, responds 400 bad request', async ()
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(400)
     .expect('Content-Type', /application\/json/)
 })
 
 test('verify that a single blog can be deleted', async () => {
+  const newBlog = {
+    title: 'JK Blog',
+    author: 'Joshua Kenta',
+    url: 'www.jkhirako.com',
+    likes: 1,
+  }
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
   const blogsAtStart = await helper.blogsInDb()
-  const blogToBeDeleted = blogsAtStart[0]
+  const blogToBeDeleted = blogsAtStart.at(-1)
 
   await api
     .delete(`/api/blogs/${blogToBeDeleted.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
 
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 
   const contents = blogsAtEnd.map(b => b.title)
-  assert(!contents.includes('React patterns'))
+  assert(!contents.includes('JK Blog'))
 })
 
 test('successfully updates the likes of a blog', async () => {

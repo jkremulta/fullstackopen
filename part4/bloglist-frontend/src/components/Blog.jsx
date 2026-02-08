@@ -1,6 +1,5 @@
-const Blog = ({ blog, user, handleLogout }) => (
+const Blog = ({ blog }) => (
   <div>
-    <p>{user.name} logged in <button onClick={handleLogout}>log out</button></p>
     {blog.title} {blog.author}
   </div>  
 )

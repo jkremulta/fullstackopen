@@ -21,7 +21,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -57,9 +57,9 @@ const App = () => {
   }
 
   const handleLogout = () => {
-  window.localStorage.removeItem('loggedBlogUser')
-  blogService.setToken(null)
-  setUser(null)
+    window.localStorage.removeItem('loggedBlogUser')
+    blogService.setToken(null)
+    setUser(null)
   }
 
 
@@ -69,13 +69,47 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
 
     setNotification({
-        message: `a new blog ${form.title} by ${form.author} added`,
-        type: 'success'
-      })
+      message: `a new blog ${form.title} by ${form.author} added`,
+      type: 'success'
+    })
     setTimeout(() => setNotification({ message: null, type: null }), 5000)
   }
 
-  if (user == null) {
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user.id
+    }
+
+    const returnedBlog = await blogService.update(blog.id, updatedBlog)
+
+    setBlogs(
+      blogs
+        .map(b => (b.id === returnedBlog.id ? returnedBlog : b))
+        .sort((a, b) => b.likes - a.likes)
+    )
+  }
+
+  const handleDeleteBlog = async (id) => {
+    try {
+      await blogService.deleteBlog(id)
+      setBlogs(blogs.filter(b => b.id !== id))
+      setNotification({
+        message: 'Blog has been deleted',
+        type: 'success'
+      })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+    } catch(error) {
+      setNotification({
+        message: error.response.data.error,
+        type: 'error'
+      })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+    }
+  }
+
+  if (user === null) {
     return (
       <div>
         <Notification message ={notification.message} type={notification.type}/>
@@ -92,9 +126,10 @@ const App = () => {
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <Form handleCreateBlog={handleCreateBlog}/>
       </Togglable>
-      
+
+
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} onLike={handleLike} onDelete={handleDeleteBlog} />
       )}
 
     </div>

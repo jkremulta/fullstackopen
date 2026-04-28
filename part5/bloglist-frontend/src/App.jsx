@@ -127,11 +127,16 @@ const App = () => {
         <Form handleCreateBlog={handleCreateBlog}/>
       </Togglable>
 
-      <div className='blog'>
-         {blogs.map(blog =>
-        <Blog key={blog.id} loggedUser={user} blog={blog} onLike={handleLike} onDelete={handleDeleteBlog} />
+      {blogs.map(blog =>
+        <div className="blog" key={blog.id}>
+          <Blog
+            blog={blog}
+            loggedUser={user}
+            onLike={handleLike}
+            onDelete={handleDeleteBlog}
+          />
+        </div>
       )}
-      </div>
 
     </div>
   )

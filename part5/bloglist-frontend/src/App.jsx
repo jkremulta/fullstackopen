@@ -56,6 +56,7 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
+      navigate('/')
       setNotification({
         message: `${user.name} logged in`,
         type: 'success'
@@ -81,11 +82,12 @@ const App = () => {
     const createdBlog = await blogService.create(form)
     setBlogs(blogs.concat(createdBlog))
 
+    navigate('/')
     setNotification({
       message: `a new blog ${form.title} by ${form.author} added`,
       type: 'success'
     })
-    navigate('/')
+    
     setTimeout(() => setNotification({ message: null, type: null }), 5000)
   }
 
@@ -185,16 +187,6 @@ const App = () => {
           }
           />
         </Routes>
-
-
-      {/* <Notification message ={notification.message} type={notification.type}/>
-      <p>{user.name} logged in <button onClick={handleLogout}>log out</button></p>
-      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-        <Form handleCreateBlog={handleCreateBlog}/>
-      </Togglable> */}
-
-     
-
     </div>
   )
 }

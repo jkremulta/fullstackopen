@@ -1,11 +1,19 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Form from './components/Form'
 import Notification from './components/Notification'
+import BlogList from './components/BlogList'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { useNavigate } from 'react-router-dom'
+
+import {
+  useMatch,
+  BrowserRouter as Router,
+  Routes, Route, Link,
+} from 'react-router-dom'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -16,7 +24,8 @@ const App = () => {
     message: null,
     type: null
   })
-  const blogFormRef = useRef()
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -66,12 +75,12 @@ const App = () => {
   const handleCreateBlog = async (form) => {
     const createdBlog = await blogService.create(form)
     setBlogs(blogs.concat(createdBlog))
-    blogFormRef.current.toggleVisibility()
 
     setNotification({
       message: `a new blog ${form.title} by ${form.author} added`,
       type: 'success'
     })
+    navigate('/')
     setTimeout(() => setNotification({ message: null, type: null }), 5000)
   }
 
@@ -99,6 +108,7 @@ const App = () => {
         message: 'Blog has been deleted',
         type: 'success'
       })
+      navigate('/')
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
     } catch(error) {
       setNotification({
@@ -109,6 +119,10 @@ const App = () => {
     }
   }
 
+  const match = useMatch('/blogs/:id')
+  const blog = match 
+    ? blogs.find(blog => blog.id === match.params.id) : null
+
   if (user === null) {
     return (
       <div>
@@ -118,25 +132,72 @@ const App = () => {
     )
   }
 
+  const padding = {
+    padding: 5
+  }
+
   return (
     <div>
       <Notification message ={notification.message} type={notification.type}/>
-      <h2>blogs</h2>
+      {/* header */}
+        <div>
+          <Link style={padding} to="/">blogs</Link>
+          <Link style={padding} to="/create">new blog</Link>
+          {user === null ? (
+            <Link style={padding} to="/login">login</Link>
+          ) : (
+            <button onClick={handleLogout}>log out</button>
+          )}
+        </div>
+
+        <Routes>
+          <Route path="/blogs/:id" element={
+            <Blog 
+              blog={blog}
+              loggedUser={user}
+              onDelete={handleDeleteBlog}
+              onLike={handleLike}/>
+          } />
+          <Route path="/" element={
+            <BlogList
+              blogs={blogs}
+              
+            />
+          } />
+          <Route path="/login" element={
+            user === null ? (
+              <Login 
+              handleLogin={handleLogin} 
+              username={username} 
+              setUsername={setUsername} 
+              password={password} 
+              setPassword={setPassword}
+              />
+            ) : (
+              <BlogList
+                blogs={blogs}
+                user={user}
+                handleDeleteBlog={handleDeleteBlog}
+                handleLike={handleLike}
+              />
+            )
+          } />
+          <Route path="/create" element={
+            <Form
+              handleCreateBlog={handleCreateBlog}
+              />
+          }
+          />
+        </Routes>
+
+
+      {/* <Notification message ={notification.message} type={notification.type}/>
       <p>{user.name} logged in <button onClick={handleLogout}>log out</button></p>
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <Form handleCreateBlog={handleCreateBlog}/>
-      </Togglable>
+      </Togglable> */}
 
-      {blogs.map(blog =>
-        <div className="blog" key={blog.id}>
-          <Blog
-            blog={blog}
-            loggedUser={user}
-            onLike={handleLike}
-            onDelete={handleDeleteBlog}
-          />
-        </div>
-      )}
+     
 
     </div>
   )

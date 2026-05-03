@@ -9,14 +9,14 @@ import Blog from './Blog'
 import userEvent from '@testing-library/user-event'
 
 const blog = {
-    title: 'Testing React',
-    author: 'Jane Doe',
-    url: 'https://example.com',
-    likes: 5,
-    user: { name: 'Jane' }
-  }
+  title: 'Testing React',
+  author: 'Jane Doe',
+  url: 'https://example.com',
+  likes: 5,
+  user: { username: 'Jane' }
+}
 
-test('renders title and author, but not url or likes by default', () => {
+test('Blog information and number of likes are displayed to unauthenticated users, buttons are not displayed', () => {
   
   render(
     <Blog
@@ -24,55 +24,48 @@ test('renders title and author, but not url or likes by default', () => {
     />
   )
 
-  const title = screen.getByText('Testing React Jane Doe')
+  const title = screen.getByText('Testing React: Jane Doe')
   expect(title).toBeVisible()
 
-
-  const url = screen.queryByText('https://example.com')
-  expect(url).toBeNull()
-
-  const likes = screen.queryByText(5)
-  expect(likes).toBeNull()
-})
-
-test('checks the blogs URL and number of likes are shown when the button is clicked', async () => {
-  const user = userEvent.setup()
-
-  render(
-    <Blog
-      blog={blog}
-    />
-  )
-
-  const button = screen.getByText('view')
-
-  await user.click(button)
 
   const url = screen.getByText('https://example.com')
   expect(url).toBeVisible()
 
   const likes = screen.getByText('likes 5')
   expect(likes).toBeVisible()
+
+  const button = screen.queryByRole('button', { name: 'like' })
+  expect(button).toBeNull()
 })
 
-test('ensures if the like button is pressed twice, event hander component receives two', async () => {
-  const user = userEvent.setup()
-  const likeMock = vi.fn()
+test('Authenticated users who are not the creator of the blog are shown only the like button', () => {
 
-   render(
+  render(
     <Blog
       blog={blog}
-      onLike={likeMock}
+      loggedUser={{ username: "Bob" }}
     />
   )
 
-  const button = screen.getByText('view')
-  await user.click(button)
+  const url = screen.getByText('https://example.com')
+  expect(url).toBeVisible()
 
-  const like_button = await screen.getByText('like')
-  await user.click(like_button)
-  await user.click(like_button)
+  const likeButton = screen.queryByRole('button', { name: 'like' })
+  expect(likeButton).toBeVisible()
 
-  expect(likeMock.mock.calls).toHaveLength(2)
+  const removeButton = screen.queryByRole('button', { name: 'remove' })
+  expect(removeButton).toBeNull()
+})
+
+test('The creator of the blog is shown the delete button', async () => {
+   render(
+    <Blog
+      blog={blog}
+      loggedUser={{ username: "Jane" }}
+    />
+  )
+  
+  const removeButton = screen.queryByRole('button', { name: 'remove' })
+  expect(removeButton).toBeVisible()
 
 })

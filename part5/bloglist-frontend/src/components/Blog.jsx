@@ -3,7 +3,8 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
     return <div>loading...</div>
   }
 
-  const showRemove = blog.user.username === loggedUser.username
+  const showRemove = loggedUser?.username === blog.user.username
+  const showLike = !!loggedUser
   
 
   return (
@@ -11,7 +12,9 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
           <h2>{blog.title}: {blog.author}</h2>
           <a href={blog.url}>{blog.url}</a>
           <div>likes {blog.likes}
-            <button onClick={() => onLike(blog)}>like</button>
+            {showLike && (
+              <button onClick={() => onLike(blog)}>like</button>
+            )}
           </div>
           <div>{blog.user.name}</div>
           {showRemove && (

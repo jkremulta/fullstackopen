@@ -123,15 +123,6 @@ const App = () => {
   const blog = match 
     ? blogs.find(blog => blog.id === match.params.id) : null
 
-  if (user === null) {
-    return (
-      <div>
-        <Notification message ={notification.message} type={notification.type}/>
-        <Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword}/>
-      </div>
-    )
-  }
-
   const padding = {
     padding: 5
   }

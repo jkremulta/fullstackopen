@@ -56,6 +56,11 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
+      setNotification({
+        message: `${user.name} logged in`,
+        type: 'success'
+      })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
     } catch (error) {
       setNotification({
         message: error.response.data.error,

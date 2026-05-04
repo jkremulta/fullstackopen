@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { TextField, Button } from '@mui/material'
 
 const Form = ({ handleCreateBlog }) => {
 
@@ -23,48 +24,51 @@ const Form = ({ handleCreateBlog }) => {
       <h2>create new</h2>
       <form onSubmit={createBlog}>
         <div>
-          <label>
-            title:
-            <input 
-              type="text"
-              name="title"
-              value={form.title}
-              onChange={(event) => setForm({
+          <TextField
+            name='title'
+            sx={{ width: '40ch' }}
+            size='small'
+            margin="dense"
+            id='outline-required'
+            label='title'
+            value={form.title}
+            onChange={(event) => setForm({
                 ...form,
                 [event.target.name]: event.target.value
-              })}
-            />
-          </label>
+            })}
+          ></TextField>
         </div>
         <div>
-          <label>
-            author:
-            <input 
-              type="text"
-              name="author"
-              value={form.author}
-              onChange={(event) => setForm({
+          <TextField
+            name='author'
+            sx={{ width: '40ch' }}
+            size='small'
+            margin="dense"
+            id='outline-required'
+            label='author'
+            value={form.author}
+            onChange={(event) => setForm({
                 ...form,
                 [event.target.name]: event.target.value
-              })}
-            />
-          </label>
+            })}
+          ></TextField>
         </div>
         <div>
-          <label>
-            url:
-            <input
-              type="text"
-              name="url" 
-              value={form.url}
-              onChange={(event) => setForm({
+          <TextField
+            name='url'
+            sx={{ width: '40ch' }}
+            size='small'
+            margin="dense"
+            id='outline-required'
+            label='url'
+            value={form.url}
+            onChange={(event) => setForm({
                 ...form,
                 [event.target.name]: event.target.value
-              })}
-            />
-          </label>
+            })}
+          ></TextField>
         </div>
-        <button type="submit">create</button>
+        <Button sx={{ mt:2 }} variant='contained' type="submit">create</Button>
       </form>
     </div>
   )

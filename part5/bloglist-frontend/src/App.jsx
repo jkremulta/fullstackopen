@@ -15,6 +15,12 @@ import {
   Routes, Route, Link,
 } from 'react-router-dom'
 
+import { Container } from '@mui/material'
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
@@ -130,64 +136,67 @@ const App = () => {
   const blog = match 
     ? blogs.find(blog => blog.id === match.params.id) : null
 
-  const padding = {
-    padding: 5
-  }
-
   return (
-    <div>
-      <Notification message ={notification.message} type={notification.type}/>
-      {/* header */}
-        <div>
-          <Link style={padding} to="/">blogs</Link>
-          <Link style={padding} to="/create">new blog</Link>
-          {user === null ? (
-            <Link style={padding} to="/login">login</Link>
-          ) : (
-            <button onClick={handleLogout}>log out</button>
-          )}
-        </div>
+    <Container>
+      <div>
+        <Notification message ={notification.message} type={notification.type}/>
+          <AppBar position='static'>
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                Blog App
+              </Typography>
+              <Button color="inherit" component={Link} to="/">blogs</Button>
+              <Button color='inherit' component={Link} to="create">new blog</Button>
+              {user === null ? (
+                <Button color='inherit' component={Link} to="/login">login</Button>
+              ) : (
+                <Button color='inherit' onClick={handleLogout}>logout</Button>
+              )}
+            </Toolbar>
 
-        <Routes>
-          <Route path="/blogs/:id" element={
-            <Blog 
-              blog={blog}
-              loggedUser={user}
-              onDelete={handleDeleteBlog}
-              onLike={handleLike}/>
-          } />
-          <Route path="/" element={
-            <BlogList
-              blogs={blogs}
-              
-            />
-          } />
-          <Route path="/login" element={
-            user === null ? (
-              <Login 
-              handleLogin={handleLogin} 
-              username={username} 
-              setUsername={setUsername} 
-              password={password} 
-              setPassword={setPassword}
-              />
-            ) : (
+          </AppBar>
+
+          <Routes>
+            <Route path="/blogs/:id" element={
+              <Blog 
+                blog={blog}
+                loggedUser={user}
+                onDelete={handleDeleteBlog}
+                onLike={handleLike}/>
+            } />
+            <Route path="/" element={
               <BlogList
                 blogs={blogs}
-                user={user}
-                handleDeleteBlog={handleDeleteBlog}
-                handleLike={handleLike}
+                
               />
-            )
-          } />
-          <Route path="/create" element={
-            <Form
-              handleCreateBlog={handleCreateBlog}
-              />
-          }
-          />
-        </Routes>
-    </div>
+            } />
+            <Route path="/login" element={
+              user === null ? (
+                <Login 
+                handleLogin={handleLogin} 
+                username={username} 
+                setUsername={setUsername} 
+                password={password} 
+                setPassword={setPassword}
+                />
+              ) : (
+                <BlogList
+                  blogs={blogs}
+                  user={user}
+                  handleDeleteBlog={handleDeleteBlog}
+                  handleLike={handleLike}
+                />
+              )
+            } />
+            <Route path="/create" element={
+              <Form
+                handleCreateBlog={handleCreateBlog}
+                />
+            }
+            />
+          </Routes>
+      </div>
+    </Container>
   )
 }
 

@@ -1,4 +1,4 @@
-import Paper from '@mui/material/Paper';
+import Paper from '@mui/material/Paper'
 import { Box, Typography, Button } from '@mui/material'
 
 const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
@@ -8,10 +8,10 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
 
   const showRemove = loggedUser?.username === blog.user.username
   const showLike = !!loggedUser
-  
+
 
   return (
-    <Paper 
+    <Paper
       elevation={1}
       sx={{ p:2, mt:2 }}>
       <div>
@@ -22,26 +22,23 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
         <div>
           <Typography>{blog.likes} likes</Typography>
         </div>
-         
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography>likes {blog.likes}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography>likes {blog.likes}</Typography>
 
-            {showLike && (
-              <Button size='small' variant='outlined' onClick={() => onLike(blog)}>
+          {showLike && (
+            <Button size='small' variant='outlined' onClick={() => onLike(blog)}>
                 like
-              </Button>
-            )}
+            </Button>
+          )}
 
-            {showRemove && (
-              <Button color='error' size='small' variant='outlined' onClick={() => onDelete(blog.id)}>
+          {showRemove && (
+            <Button color='error' size='small' variant='outlined' onClick={() => onDelete(blog.id)}>
                 remove
-              </Button>
-            )}
-          </Box>
-         
-        </div>
+            </Button>
+          )}
+        </Box>
+      </div>
     </Paper>
-        
   )}
 
 export default Blog

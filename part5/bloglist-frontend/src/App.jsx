@@ -16,10 +16,10 @@ import {
 } from 'react-router-dom'
 
 import { Container } from '@mui/material'
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -93,7 +93,7 @@ const App = () => {
       message: `a new blog ${form.title} by ${form.author} added`,
       type: 'success'
     })
-    
+
     setTimeout(() => setNotification({ message: null, type: null }), 5000)
   }
 
@@ -133,68 +133,66 @@ const App = () => {
   }
 
   const match = useMatch('/blogs/:id')
-  const blog = match 
+  const blog = match
     ? blogs.find(blog => blog.id === match.params.id) : null
 
   return (
     <Container>
       <div>
         <Notification message ={notification.message} type={notification.type}/>
-          <AppBar position='static'>
-            <Toolbar>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <AppBar position='static'>
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 Blog App
-              </Typography>
-              <Button color="inherit" component={Link} to="/">blogs</Button>
-              <Button color='inherit' component={Link} to="create">new blog</Button>
-              {user === null ? (
-                <Button color='inherit' component={Link} to="/login">login</Button>
-              ) : (
-                <Button color='inherit' onClick={handleLogout}>logout</Button>
-              )}
-            </Toolbar>
+            </Typography>
+            <Button color="inherit" component={Link} to="/">blogs</Button>
+            <Button color='inherit' component={Link} to="create">new blog</Button>
+            {user === null ? (
+              <Button color='inherit' component={Link} to="/login">login</Button>
+            ) : (
+              <Button color='inherit' onClick={handleLogout}>logout</Button>
+            )}
+          </Toolbar>
 
-          </AppBar>
+        </AppBar>
 
-          <Routes>
-            <Route path="/blogs/:id" element={
-              <Blog 
-                blog={blog}
-                loggedUser={user}
-                onDelete={handleDeleteBlog}
-                onLike={handleLike}/>
-            } />
-            <Route path="/" element={
+        <Routes>
+          <Route path="/blogs/:id" element={
+            <Blog
+              blog={blog}
+              loggedUser={user}
+              onDelete={handleDeleteBlog}
+              onLike={handleLike}/>
+          } />
+          <Route path="/" element={
+            <BlogList
+              blogs={blogs}/>
+          } />
+          <Route path="/login" element={
+            user === null ? (
+              <Login
+                handleLogin={handleLogin}
+                username={username}
+                setUsername={setUsername}
+                password={password}
+                setPassword={setPassword}
+              />
+            ) : (
               <BlogList
                 blogs={blogs}
-                
+                user={user}
+                handleDeleteBlog={handleDeleteBlog}
+                handleLike={handleLike}
               />
-            } />
-            <Route path="/login" element={
-              user === null ? (
-                <Login 
-                handleLogin={handleLogin} 
-                username={username} 
-                setUsername={setUsername} 
-                password={password} 
-                setPassword={setPassword}
-                />
-              ) : (
-                <BlogList
-                  blogs={blogs}
-                  user={user}
-                  handleDeleteBlog={handleDeleteBlog}
-                  handleLike={handleLike}
-                />
-              )
-            } />
-            <Route path="/create" element={
-              <Form
-                handleCreateBlog={handleCreateBlog}
-                />
-            }
+            )
+          } />
+          <Route path="/create" element={
+            <Form
+              handleCreateBlog={handleCreateBlog}
             />
-          </Routes>
+          }
+          />
+        </Routes>
       </div>
     </Container>
   )

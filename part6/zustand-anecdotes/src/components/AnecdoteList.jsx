@@ -4,19 +4,13 @@ import { useFilter } from '../store'
 import { useNotificationActions } from '../notificationStore'
 
 const AnecdoteList = () => {
-  const anecdotes = useAnecdotes().toSorted((a, b) => b.votes - a.votes)
+  const anecdotes = useAnecdotes()
   const { vote, remove } = useAnecdoteActions()
-  const filter = useFilter()
   const { setNotification } = useNotificationActions()
-
-  // filter by keywords
-  const filteredAnecdotes = anecdotes.filter((anecdote) => (
-    anecdote.content.toLowerCase().includes(filter.toLowerCase())
-  ))
 
   return (
     <>
-      {filteredAnecdotes.map(anecdote => (
+      {anecdotes.map(anecdote => (
           <div key={anecdote.id}>
             <div>{anecdote.content}</div>
             <div>

@@ -18,7 +18,7 @@ const createNew = async (content) => {
   })
 
   if (!response.ok) {
-    throw new Error('Failed to create anecdote')
+    throw new Error('too short anecdote, must have length 5 or more')
   }
 
   return await response.json()

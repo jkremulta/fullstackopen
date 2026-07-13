@@ -1,0 +1,17 @@
+{
+  "anecdotes": [
+    {
+      "content": "hey this is new data!",
+      "author": "lol",
+      "info": "www.newdata.com",
+      "id": "ItfZ-t4fzIA"
+    },
+    {
+      "content": "hey this is new data again!",
+      "author": "lol",
+      "info": "newdataagain.com",
+      "id": "USFmtdHhRmg"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

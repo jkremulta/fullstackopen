@@ -8,6 +8,8 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import { useNavigate } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+import ErrorFallback from './components/ErrorFallback'
 
 import {
   useMatch,
@@ -155,44 +157,45 @@ const App = () => {
           </Toolbar>
 
         </AppBar>
-
-        <Routes>
-          <Route path="/blogs/:id" element={
-            <Blog
-              blog={blog}
-              loggedUser={user}
-              onDelete={handleDeleteBlog}
-              onLike={handleLike}/>
-          } />
-          <Route path="/" element={
-            <BlogList
-              blogs={blogs}/>
-          } />
-          <Route path="/login" element={
-            user === null ? (
-              <Login
-                handleLogin={handleLogin}
-                username={username}
-                setUsername={setUsername}
-                password={password}
-                setPassword={setPassword}
-              />
-            ) : (
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Routes>
+            <Route path="/blogs/:id" element={
+              <Blog
+                blog={blog}
+                loggedUser={user}
+                onDelete={handleDeleteBlog}
+                onLike={handleLike}/>
+            } />
+            <Route path="/" element={
               <BlogList
-                blogs={blogs}
-                user={user}
-                handleDeleteBlog={handleDeleteBlog}
-                handleLike={handleLike}
+                blogs={blogs}/>
+            } />
+            <Route path="/login" element={
+              user === null ? (
+                <Login
+                  handleLogin={handleLogin}
+                  username={username}
+                  setUsername={setUsername}
+                  password={password}
+                  setPassword={setPassword}
+                />
+              ) : (
+                <BlogList
+                  blogs={blogs}
+                  user={user}
+                  handleDeleteBlog={handleDeleteBlog}
+                  handleLike={handleLike}
+                />
+              )
+            } />
+            <Route path="/create" element={
+              <Form
+                handleCreateBlog={handleCreateBlog}
               />
-            )
-          } />
-          <Route path="/create" element={
-            <Form
-              handleCreateBlog={handleCreateBlog}
+            }
             />
-          }
-          />
-        </Routes>
+          </Routes>
+        </ErrorBoundary>
       </div>
     </Container>
   )

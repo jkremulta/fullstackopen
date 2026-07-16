@@ -1,4 +1,4 @@
-import Blog from "./Blog"
+import Blog from './Blog'
 import { Link } from 'react-router-dom'
 
 const BlogList = ({ blogs }) => {

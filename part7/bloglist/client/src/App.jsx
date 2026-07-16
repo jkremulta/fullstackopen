@@ -10,6 +10,7 @@ import loginService from './services/login'
 import { useNavigate } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorFallback from './components/ErrorFallback'
+import PageNotFound from './components/PageNotFound'
 
 import {
   useMatch,
@@ -194,6 +195,7 @@ const App = () => {
               />
             }
             />
+            <Route path='*' element={<PageNotFound />} />
           </Routes>
         </ErrorBoundary>
       </div>

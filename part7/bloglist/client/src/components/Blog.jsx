@@ -1,19 +1,19 @@
-import Paper from "@mui/material/Paper";
-import { Box, Typography, Button } from "@mui/material";
+import Paper from '@mui/material/Paper'
+import { Box, Typography, Button } from '@mui/material'
 
-const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
+const Blog = ({ loggedUser, blog, updateBlogMutation, deleteBlogMutation }) => {
   if (!blog) {
-    return <div>loading...</div>;
+    return <div>loading...</div>
   }
 
-  const showRemove = loggedUser?.username === blog.user.username;
-  const showLike = !!loggedUser;
+  const showRemove = loggedUser?.username === blog.user.username
+  const showLike = !!loggedUser
 
   return (
     <Paper elevation={1} sx={{ p: 2, mt: 2 }}>
       <div>
         <Typography variant="h5">{blog.title}</Typography>
-        <Typography sx={{ color: "text.secondary" }}>
+        <Typography sx={{ color: 'text.secondary' }}>
           by {blog.author}
         </Typography>
         <Typography>
@@ -23,14 +23,25 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
         <div>
           <Typography>{blog.likes} likes</Typography>
         </div>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography>likes {blog.likes}</Typography>
 
           {showLike && (
             <Button
               size="small"
               variant="outlined"
-              onClick={() => onLike(blog)}
+              onClick={() => {
+                const updatedBlog = {
+                  ...blog,
+                  likes: blog.likes + 1,
+                  user: blog.user.id,
+                }
+
+                updateBlogMutation.mutate({
+                  id: blog.id,
+                  newBlog: updatedBlog,
+                })
+              }}
             >
               like
             </Button>
@@ -41,7 +52,7 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
               color="error"
               size="small"
               variant="outlined"
-              onClick={() => onDelete(blog.id)}
+              onClick={() => deleteBlogMutation.mutate(blog.id)}
             >
               remove
             </Button>
@@ -49,7 +60,7 @@ const Blog = ({ loggedUser, blog, onLike, onDelete }) => {
         </Box>
       </div>
     </Paper>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog

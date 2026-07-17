@@ -1,22 +1,20 @@
-import { useState } from "react";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button } from '@mui/material'
+import { useField } from './UseField'
 
-const Form = ({ handleCreateBlog }) => {
-  const [form, setForm] = useState({
-    title: "",
-    author: "",
-    url: "",
-  });
+const Form = ({ createBlogMutation }) => {
+  const title = useField('text')
+  const author = useField('text')
+  const url = useField('text')
 
   const createBlog = (event) => {
-    event.preventDefault();
-    handleCreateBlog(form);
-    setForm({
-      title: "",
-      author: "",
-      url: "",
-    });
-  };
+    event.preventDefault()
+
+    createBlogMutation.mutate({
+      title: title.data.value,
+      author: author.data.value,
+      url: url.data.value,
+    })
+  }
 
   return (
     <div>
@@ -25,52 +23,34 @@ const Form = ({ handleCreateBlog }) => {
         <div>
           <TextField
             name="title"
-            sx={{ width: "40ch" }}
+            sx={{ width: '40ch' }}
             size="small"
             margin="dense"
             id="outline-required"
             label="title"
-            value={form.title}
-            onChange={(event) =>
-              setForm({
-                ...form,
-                [event.target.name]: event.target.value,
-              })
-            }
+            {...title.data}
           ></TextField>
         </div>
         <div>
           <TextField
             name="author"
-            sx={{ width: "40ch" }}
+            sx={{ width: '40ch' }}
             size="small"
             margin="dense"
             id="outline-required"
             label="author"
-            value={form.author}
-            onChange={(event) =>
-              setForm({
-                ...form,
-                [event.target.name]: event.target.value,
-              })
-            }
+            {...author.data}
           ></TextField>
         </div>
         <div>
           <TextField
             name="url"
-            sx={{ width: "40ch" }}
+            sx={{ width: '40ch' }}
             size="small"
             margin="dense"
             id="outline-required"
             label="url"
-            value={form.url}
-            onChange={(event) =>
-              setForm({
-                ...form,
-                [event.target.name]: event.target.value,
-              })
-            }
+            {...url.data}
           ></TextField>
         </div>
         <Button sx={{ mt: 2 }} variant="contained" type="submit">
@@ -78,7 +58,7 @@ const Form = ({ handleCreateBlog }) => {
         </Button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Form;
+export default Form

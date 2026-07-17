@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Form from './components/Form'
@@ -8,6 +8,7 @@ import Togglable from './components/Togglable'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorFallback from './components/ErrorFallback'
 import PageNotFound from './components/PageNotFound'
+import { Users } from './components/Users'
 
 import useUIStore from '../store/useUIStore'
 import { useBlogs } from '../hooks/useBlogs'
@@ -57,6 +58,9 @@ const App = () => {
             <Button color="inherit" component={Link} to="/">
               blogs
             </Button>
+            <Button color="inherit" component={Link} to="users">
+              users
+            </Button>
             <Button color="inherit" component={Link} to="create">
               new blog
             </Button>
@@ -95,6 +99,7 @@ const App = () => {
                 )
               }
             />
+            <Route path="/users" element={<Users />} />
             <Route
               path="/create"
               element={<Form createBlogMutation={createBlogMutation} />}

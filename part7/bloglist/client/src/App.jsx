@@ -34,8 +34,6 @@ const App = () => {
 
   const { loginMutation, logout, initializeUser } = useAuth()
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const { user } = useAuthStore()
 
   const { notification } = useUIStore()
@@ -43,15 +41,6 @@ const App = () => {
   useEffect(() => {
     initializeUser()
   }, [])
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
-    loginMutation.mutate({ username, password })
-
-    setUsername('')
-    setPassword('')
-  }
 
   const match = useMatch('/blogs/:id')
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
@@ -100,13 +89,7 @@ const App = () => {
               path="/login"
               element={
                 user === null ? (
-                  <Login
-                    handleLogin={handleLogin}
-                    username={username}
-                    setUsername={setUsername}
-                    password={password}
-                    setPassword={setPassword}
-                  />
+                  <Login loginMutation={loginMutation} />
                 ) : (
                   <BlogList blogs={blogs} />
                 )

@@ -1,39 +1,49 @@
-import { TextField, Button } from "@mui/material";
+import { TextField, Button } from '@mui/material'
+import { useField } from './UseField'
 
-const Login = ({
-  handleLogin,
-  username,
-  setUsername,
-  password,
-  setPassword,
-}) => (
-  <div>
-    <h1>Log in to application</h1>
-    <form onSubmit={handleLogin}>
-      <div>
-        <TextField
-          id="standard-required"
-          variant="standard"
-          label="username"
-          value={username}
-          onChange={({ target }) => setUsername(target.value)}
-        ></TextField>
-      </div>
-      <div>
-        <TextField
-          id="standard-password-input"
-          type="password"
-          variant="standard"
-          label="password"
-          value={password}
-          onChange={({ target }) => setPassword(target.value)}
-        ></TextField>
-      </div>
-      <Button sx={{ mt: 1 }} variant="contained" type="submit">
-        login
-      </Button>
-    </form>
-  </div>
-);
+const Login = ({ loginMutation }) => {
+  const username = useField('text')
+  const password = useField('password')
 
-export default Login;
+  const handleLogin = (event) => {
+    event.preventDefault()
+
+    loginMutation.mutate({
+      username: username.data.value,
+      password: password.data.value,
+    })
+
+    username.reset()
+    password.reset()
+  }
+
+  return (
+    <div>
+      <h1>Log in to application</h1>
+      <form onSubmit={handleLogin}>
+        <div>
+          <TextField
+            id="standard-required"
+            variant="standard"
+            label="username"
+            {...username.data}
+          ></TextField>
+        </div>
+        <div>
+          <TextField
+            id="standard-password-input"
+            type="password"
+            variant="standard"
+            label="password"
+            {...password.data}
+          ></TextField>
+        </div>
+        <Button sx={{ mt: 1 }} variant="contained" type="submit">
+          login
+        </Button>
+      </form>
+    </div>
+  )
+}
+
+export default Login

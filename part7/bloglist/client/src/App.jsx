@@ -38,8 +38,13 @@ const App = () => {
     usersService.getAll().then((users) => setUsers(users))
   }, [])
 
-  const { blogs, createBlogMutation, updateBlogMutation, deleteBlogMutation } =
-    useBlogs()
+  const {
+    blogs,
+    createBlogMutation,
+    updateBlogMutation,
+    deleteBlogMutation,
+    addCommentMutation,
+  } = useBlogs()
 
   const { loginMutation, logout, initializeUser } = useAuth()
 
@@ -100,6 +105,7 @@ const App = () => {
                   loggedUser={user}
                   deleteBlogMutation={deleteBlogMutation}
                   updateBlogMutation={updateBlogMutation}
+                  addCommentMutation={addCommentMutation}
                 />
               }
             />

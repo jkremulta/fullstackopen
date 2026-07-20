@@ -51,6 +51,22 @@ export const useBlogs = () => {
       }),
   })
 
+  const addCommentMutation = useMutation({
+    mutationFn: ({ id, comment }) => blogService.addComment(id, comment),
+    onSuccess: () => {
+      setNotification({
+        message: 'Comment added successfully',
+        type: 'success',
+      })
+      invalidate()
+    },
+    onError: (error) =>
+      setNotification({
+        message: error.response.data.error,
+        type: 'error',
+      }),
+  })
+
   return {
     blogs: blogsQuery.data ?? [],
 
@@ -58,5 +74,6 @@ export const useBlogs = () => {
     createBlogMutation,
     updateBlogMutation,
     deleteBlogMutation,
+    addCommentMutation,
   }
 }

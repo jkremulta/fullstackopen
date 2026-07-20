@@ -8,7 +8,8 @@ import Togglable from './components/Togglable'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorFallback from './components/ErrorFallback'
 import PageNotFound from './components/PageNotFound'
-import { Users } from './components/Users'
+import Users from './components/Users'
+import User from './components/User'
 
 import useUIStore from '../store/useUIStore'
 import { useBlogs } from '../hooks/useBlogs'
@@ -28,8 +29,15 @@ import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
+import usersService from './services/users'
+import { useState } from 'react'
 
 const App = () => {
+  const [users, setUsers] = useState([])
+  useEffect(() => {
+    usersService.getAll().then((users) => setUsers(users))
+  }, [])
+
   const { blogs, createBlogMutation, updateBlogMutation, deleteBlogMutation } =
     useBlogs()
 
@@ -43,8 +51,15 @@ const App = () => {
     initializeUser()
   }, [])
 
-  const match = useMatch('/blogs/:id')
-  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
+  const matchBlog = useMatch('/blogs/:id')
+  const blog = matchBlog
+    ? blogs.find((blog) => blog.id === matchBlog.params.id)
+    : null
+
+  const matchUser = useMatch('/users/:id')
+  const selectedUser = matchUser
+    ? users.find((user) => user.id === matchUser.params.id)
+    : null
 
   return (
     <Container>
@@ -99,10 +114,14 @@ const App = () => {
                 )
               }
             />
-            <Route path="/users" element={<Users />} />
+            <Route path="/users" element={<Users users={users} />} />
             <Route
               path="/create"
               element={<Form createBlogMutation={createBlogMutation} />}
+            />
+            <Route
+              path="/users/:id"
+              element={<User selectedUser={selectedUser} />}
             />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
